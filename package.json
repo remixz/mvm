@@ -1,0 +1,26 @@
+{
+  "author": "Zachary Bruggeman <zbruggeman@me.com>",
+  "name": "mvm",
+  "description": "Minecraft version manager.",
+  "license": "MIT",
+  "version": "0.0.1",
+  "homepage": "https://github.com/remixz/mvm",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/remixz/mvm"
+  },
+  "bugs": {
+    "url": "https://github.com/remixz/mvm/issues"
+  },
+  "bin": {
+    "mvm": "bin/mvm.js"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "optionalDependencies": {},
+  "engines": {
+    "node": ">=0.8"
+  }
+}
