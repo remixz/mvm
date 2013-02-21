@@ -1,6 +1,8 @@
 ## mvm
 
-A Minecraft version mananger. In Node. Deal with it. Please note this is very early, very messy and very simple. Please see the [Todos](https://github.com/remixz/mvm/issues/1) issue for planned things.
+A Minecraft version mananger. In Node. Deal with it.
+
+Please note this is early, messy and simple. Please see the [Todos](https://github.com/remixz/mvm/issues/1) issue for planned things.
 
 ### Installation
 
@@ -18,4 +20,4 @@ A Minecraft version mananger. In Node. Deal with it. Please note this is very ea
 
 ### Details
 
-This module is very messy, as I mainly wanted it to install new Minecraft "snapshots" (pre-releases) easily without having to copy/paste files all over the place. This will store downloaded copies in `[path to .minecraft]/mvm_bins`, and allow you to quickly switch between them. This won't store any mods or any sorts of that, and merely just replaces the `minecraft.jar` file. Pull Requests are welcome if you want this to be more useful!
+This module is pretty messy, as I mainly wanted it to install new Minecraft "snapshots" (pre-releases) easily without having to copy/paste files all over the place. This will store downloaded copies in `[path to .minecraft]/mvm_bins`, and allow you to quickly switch between them. Feature requests are welcome!

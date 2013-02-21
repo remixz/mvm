@@ -10,127 +10,123 @@
 /**
  * Dependencies
  */
-var ProgressBar = require('progress');
 var fs          = require('fs');
 var http        = require('http');
+var ProgressBar = require('progress');
 var program     = require('commander');
 
 /**
  * Constructor
  */
-
-function mvm () {
-
-};
+function mvm () {};
 
 mvm.prototype.getUserDirectory = function () {
-	return process.env[(process.platform === 'win32') ? 'APPDATA' : 'HOME'];
+    return process.env[(process.platform === 'win32') ? 'APPDATA' : 'HOME'];
 };
 
 mvm.prototype.minecraftPath = function () {
-	switch (process.platform) {
-		case 'darwin':
-			return this.getUserDirectory() + '/Library/Application Support/minecraft';
-		break;
-		case 'win32':
-		case 'linux':
-			return this.getUserDirectory() + '/.minecraft';
-		break;
-	};
+    switch (process.platform) {
+        case 'darwin':
+            return this.getUserDirectory() + '/Library/Application Support/minecraft';
+        break;
+        case 'win32':
+        case 'linux':
+            return this.getUserDirectory() + '/.minecraft';
+        break;
+    };
+};
+
+mvm.prototype.paths = {
+    mvmPath: mvm.prototype.minecraftPath() + '/mvm_bins',
+    binPath: mvm.prototype.minecraftPath() + '/bin'
 };
 
 mvm.prototype.use = function (version) {
-	var mvmPath = this.minecraftPath() + '/mvm_bins';
-	var binPath = this.minecraftPath() + '/bin';
-	var jarPath = mvmPath + '/' + version + '.jar';
+    var jarPath = this.paths['mvmPath'] + '/' + version + '.jar';
 
-	if (!fs.existsSync(jarPath)) {
-		console.error('Minecraft ' + version + ' is not installed.');
-		return false;
-	};
+    if (!fs.existsSync(jarPath)) {
+        console.error('\033[31mMinecraft %s is not installed.', version);
+        return false;
+    };
 
-	fs.createReadStream(jarPath).pipe(fs.createWriteStream(binPath + '/minecraft.jar')).on('close', function() {
-		console.log('Now using Minecraft ' + version);
-		process.exit();
-	});
+    fs.createReadStream(jarPath).pipe(fs.createWriteStream(this.paths['binPath'] + '/minecraft.jar')).on('close', function() {
+        console.log('\033[32mNow using Minecraft %s!\033[0;39m', version);
+        process.exit();
+    });
 };
 
 mvm.prototype.install = function (version) {
-	var self = this;
+    var self = this;
 
-	var mvmPath = this.minecraftPath() + '/mvm_bins';
-	if (!fs.existsSync(mvmPath)) {
-		fs.mkdirSync(mvmPath);
-	};
+    if (!fs.existsSync(this.paths['mvmPath'])) {
+        fs.mkdirSync(mvmPath);
+    };
 
-	var filepath = fs.createWriteStream(mvmPath + '/' + version + '.jar', {flags: 'w'});
+    var filepath = fs.createWriteStream(this.paths['mvmPath'] + '/' + version + '.jar', {flags: 'w'});
 
-	http.get({
-		host: 'assets.minecraft.net',
-		path: '/' + version.replace(/\./g, '_') + '/minecraft.jar'
-	}, function (res) {
-		if (res.statusCode === 404) {
-			console.error('This version does not exist.');
-			fs.unlinkSync(mvmPath + '/' + version + '.jar');
-			return false;
-		};
+    http.get({
+        host: 'assets.minecraft.net',
+        path: '/' + version.replace(/\./g, '_') + '/minecraft.jar'
+    }, function (res) {
+        if (res.statusCode === 404) {
+            console.error('\033[31mThis version does not exist.');
+            fs.unlinkSync(self.paths['mvmPath'] + '/' + version + '.jar');
+            return false;
+        };
 
-		var len = parseInt(res.headers['content-length'], 10);
+        var len = parseInt(res.headers['content-length'], 10);
 
-		var bar = new ProgressBar('Downloading Minecraft v' + version + ' [:bar] (:percent, :etas)', {
-			complete: '=',
-			incomplete: ' ',
-			width: 20,
-			total: len
-		});
+        var bar = new ProgressBar('Downloading ' + version + ' [:bar] (:current of :total | :percent | :etas)', {
+            complete: '=',
+            incomplete: ' ',
+            width: 20,
+            total: len
+        });
 
-		res.on('data', function (chunk) {
-			bar.tick(chunk.length);
-		});
+        res.on('data', function (chunk) {
+            bar.tick(chunk.length);
+        });
 
-		res.on('end', function () {
-			console.log('\n----------------------')
-			self.use(version);
-		});
+        res.on('end', function () {
+            console.log('\n----------------------')
+            self.use(version);
+        });
 
-		res.pipe(filepath);
-	});
+        res.pipe(filepath);
+    });
 };
 
 mvm.prototype.stash = function (name) {
-	var mvmPath = this.minecraftPath() + '/mvm_bins';
-	var binPath = this.minecraftPath() + '/bin';
-	var jarPath = binPath + '/minecraft.jar'
+    var jarPath = this.paths['binPath'] + '/minecraft.jar'
 
-	fs.createReadStream(jarPath).pipe(fs.createWriteStream(mvmPath + '/' + name + '.jar')).on('close', function() {
-		console.log('Your current minecraft.jar has been stashed as ' + name);
-		console.log('Restore it at any time by running: mvm use ' + name);
-		process.exit();
-	});
+    fs.createReadStream(jarPath).pipe(fs.createWriteStream(this.paths['mvmPath'] + '/' + name + '.jar')).on('close', function() {
+        console.log('\033[32mYour current minecraft.jar has been stashed as %s!', name);
+        console.log('Restore it at any time by running: mvm use %s\033[0;39m', name);
+        process.exit();
+    });
 };
 
 /**
  * Command handling
  */
-
 program
-	.usage('<option> <version>')
-    .version('0.0.4');
+    .usage('<option> <version>')
+    .version('0.1.0');
 
 program.on('install', function () {
-	console.log('Installing ' + program.args[0]);
+    console.log('\033[1;30mInstalling %s \033[0;39m\n----------------------', program.args[0]);
     mvm.prototype.install(program.args[0]);
 });
 
 program.on('use', function () {
-	console.log('Using ' + program.args[0]);
+    console.log('Setting to %s \n----------------------', program.args[0]);
     mvm.prototype.use(program.args[0]);
 });
 
 program.on('stash', function () {
-	program.prompt('Name of stash: ', function (name) {
-		mvm.prototype.stash(name);
-	});
+    program.prompt('Name of stash: ', function (name) {
+        mvm.prototype.stash(name);
+    });
 });
 
 program.parse(process.argv);
