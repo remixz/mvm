@@ -1,6 +1,6 @@
 ## mvm
 
-A Minecraft version mananger. In Node. Deal with it.
+A Minecraft version mananger. In Node. Deal with it. Please note this is very early, very messy and very simple. Please see the [Todos](https://github.com/remixz/mvm/issues/1) issue for planned things.
 
 ### Installation
 
