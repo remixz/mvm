@@ -46,7 +46,7 @@ mvm.prototype.use = function (version) {
 
 	if (!fs.existsSync(jarPath)) {
 		console.error('Minecraft v' + version + ' is not installed.');
-		return;
+		return false;
 	};
 
 	fs.createReadStream(jarPath).pipe(fs.createWriteStream(binPath + '/minecraft.jar')).on('close', function() {
@@ -59,7 +59,6 @@ mvm.prototype.install = function (version) {
 	var self = this;
 
 	var mvmPath = this.minecraftPath() + '/mvm_bins';
-
 	if (!fs.existsSync(mvmPath)) {
 		fs.mkdirSync(mvmPath);
 	};
@@ -70,6 +69,12 @@ mvm.prototype.install = function (version) {
 		host: 'assets.minecraft.net',
 		path: '/' + version.replace(/\./g, '_') + '/minecraft.jar'
 	}, function (res) {
+		if (res.statusCode === 404) {
+			console.error('This version does not exist.');
+			fs.unlinkSync(mvmPath + '/' + version + '.jar');
+			return false;
+		};
+
 		var len = parseInt(res.headers['content-length'], 10);
 
 		var bar = new ProgressBar('Downloading Minecraft v' + version + ' [:bar] (:percent, :etas)', {
