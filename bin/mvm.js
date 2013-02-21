@@ -45,7 +45,7 @@ mvm.prototype.use = function (version) {
 	var jarPath = mvmPath + '/' + version + '.jar';
 
 	if (!fs.existsSync(jarPath)) {
-		console.error('Minecraft v' + version + ' is not installed.');
+		console.error('Minecraft ' + version + ' is not installed.');
 		return false;
 	};
 
@@ -97,22 +97,40 @@ mvm.prototype.install = function (version) {
 	});
 };
 
+mvm.prototype.stash = function (name) {
+	var mvmPath = this.minecraftPath() + '/mvm_bins';
+	var binPath = this.minecraftPath() + '/bin';
+	var jarPath = binPath + '/minecraft.jar'
+
+	fs.createReadStream(jarPath).pipe(fs.createWriteStream(mvmPath + '/' + name + '.jar')).on('close', function() {
+		console.log('Your current minecraft.jar has been stashed as ' + name);
+		console.log('Restore it at any time by running: mvm use ' + name);
+		process.exit();
+	});
+};
+
 /**
  * Command handling
  */
 
 program
 	.usage('<option> <version>')
-    .version('0.0.1');
+    .version('0.0.4');
 
-program.on('install', function() {
-	console.log('Installing v' + program.args[0]);
+program.on('install', function () {
+	console.log('Installing ' + program.args[0]);
     mvm.prototype.install(program.args[0]);
 });
 
-program.on('use', function() {
-	console.log('Using v' + program.args[0]);
+program.on('use', function () {
+	console.log('Using ' + program.args[0]);
     mvm.prototype.use(program.args[0]);
+});
+
+program.on('stash', function () {
+	program.prompt('Name of stash: ', function (name) {
+		mvm.prototype.stash(name);
+	});
 });
 
 program.parse(process.argv);
