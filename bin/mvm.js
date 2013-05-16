@@ -59,7 +59,7 @@ mvm.prototype.install = function (version) {
     var self = this;
 
     if (!fs.existsSync(this.paths['mvmPath'])) {
-        fs.mkdirSync(this.paths['mvmPath']));
+        fs.mkdirSync(this.paths['mvmPath']);
     };
 
     var filepath = fs.createWriteStream(this.paths['mvmPath'] + '/' + version + '.jar', {flags: 'w'});
