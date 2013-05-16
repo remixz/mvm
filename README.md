@@ -16,6 +16,8 @@ Please note this is early, messy and simple. Please see the [Todos](https://gith
 
 `mvm use <version>` -- Will use an already-downloaded version and copy it to the Minecraft bin directory.
 
+`mvm list` -- Lists all currently installed versions.
+
 `mvm stash` -- Stashes the current .jar with a custom name. This is useful for storing and restoring of modded jars quickly.
 
 ### Details

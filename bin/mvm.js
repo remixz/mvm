@@ -10,6 +10,7 @@
 /**
  * Dependencies
  */
+var path        = require('path');
 var fs          = require('fs');
 var http        = require('http');
 var ProgressBar = require('progress');
@@ -96,6 +97,23 @@ mvm.prototype.install = function (version) {
     });
 };
 
+mvm.prototype.list = function () {
+    fs.readdir(this.paths['mvmPath'], function(err, files) {
+        if (err) throw err;
+        if (files.length === 0) {
+            console.log("No versions installed.");
+            return;
+        }
+
+        files.forEach(function(file) {
+            var ext = path.extname(file);
+            if (ext === ".jar") {
+                console.log(path.basename(file, ext));
+            }
+        });
+    });
+};
+
 mvm.prototype.stash = function (name) {
     var jarPath = this.paths['binPath'] + '/minecraft.jar'
 
@@ -121,6 +139,10 @@ program.on('install', function () {
 program.on('use', function () {
     console.log('Setting to %s \n----------------------', program.args[0]);
     mvm.prototype.use(program.args[0]);
+});
+
+program.on('list', function () {
+    mvm.prototype.list();
 });
 
 program.on('stash', function () {
